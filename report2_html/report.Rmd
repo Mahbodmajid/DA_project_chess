@@ -1,0 +1,789 @@
+---
+title: "گزارش پروژه&zwnj;ی درس تحلیل&zwnj;داده&zwnj;ها"
+subtitle: "آنالیز بازی&zwnj;های شطرنج"
+author: "مهبد مجید ۹۵۱۰۹۳۷۲"
+date: "`r Sys.time()`"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+<link rel="stylesheet" type="text/css" href="style.css">
+
+
+<div class = "persian_header">
+اهداف و قسمت&zwnj;های پروژه
+</div>
+<div class = "persian_normal">
+قسمت&zwnj;های این پروژه را می&zwnj;توان به&zwnj;طور کلی به سه قسمت تقسیم&zwnj;کرد.
+</div>
+
+<div class = "persian_normal">
+قسمت اول گه مربوط به کرال&zwnj;کردن داده از سایت فیده و تمیزکردن آن&zwnj;هاست.
+در این بخش یک کرالر برای گرفتن داده&zwnj;ها از سایت فیده نوشته&zwnj;شد و سپس هم یک تابع برای پاک&zwnj;سازی آن&zwnj;ها.
+</div>
+
+<div class = "persian_normal">
+قسمت دوم که مربوط به پاک&zwnj;سازی داده&zwnj;های فرمت PGN است.
+در این قسمت از داده&zwnj;ی
+Aepli
+موجود در وبسایت
+</div>
+
+https://chessdatabaseandmore.blogspot.com/
+
+<div class = "persian_normal">
+استفاده&zwnj;کردیم.
+در این قسمت تابعی برای پاک&zwnj;سازی و تبدیل این نوع داده&zwnj;ها به داده&zwnj;ی 
+با فرمت
+CSV
+نوشته&zwnj;شده است.
+ولی از آنجایی که اجرای این تابع زمان&zwnj;بر است تابعی هم برای این که داده&zwnj;ی اصلی را بخش بخش کند و تعدادی از بخش&zwnj;های آن را نمونه بگیرد نوشته&zwnj;شده&zwnj;است تا بتوان با بخش&zwnj;های کوچتری از داده&zwnj;ی اصلی کار کرد.
+</div>
+
+<div class = "persian_normal">
+قسمت سوم که مربوط به استفاده از داده&zwnj;های به&zwnj;دست آمده و یافتن نتایج جالب است.
+</div>
+
+> <p dir="RTL"> 
+کارهای انجام&zwnj;شده در این قسمت عمدتن مربوط به جمع&zwnj;آوری داده از سایت
+FIDE
+و بعد هم تمیز کردن آن&zwnj;هاست.
+</p>
+
+<div class = "persian_header">
+جمع&zwnj;آوری داده&zwnj;های سایت FIDE
+</div>
+
+<div class = "persian_normal">
+سایت FIDE
+در آدرس
+https://ratings.fide.com/download.phtml
+حاوی ریتینگ&zwnj;های فیده از سال ۲۰۰۰ و به بعد است.
+مشکلی که این داده&zwnj;ها دارند این است که تنها از جایی به بعد شامل داده&zwnj;های با فرمت XML هستند و پیش از آن تنها شامل داده&zwnj;هایی به فرمت txt هستند.
+و اگر که یکی از این داده&zwnj;ها را باز کنیم مشاهده می&zwnj;کنیم که این داده&zwnj;ها به&zwnj;شدت کثیف هستند.
+حال ما برای دست&zwnj;یافتن به داده&zwnj;های قابل کار کردن چند مرحله کار داریم.
+اول آن که داده&zwnj;ها را با استفاده از نوشتن یک crawler از سایت FIDE دانلود کنیم.
+سپس اینکه این داده&zwnj;ها را از حالت فشرده&zwnj;سازی خارج کنیم.
+و پس از آن هم داده&zwnj;ها را به فرمتی قابل استفاده در بیاوریم.س
+</div>
+
+
+<div class = "persian_subheader">
+نوشتن crawler
+</div>
+
+
+<div class = "persian_normal">
+برای نوشتن crawler باید به چند نکته توجه می&zwnj;شد.
+
+اول از همه اینکه داده&zwnj;ها برای از حدودای سال ۲۰۱۲ به قبل تنها شامل ریتینگ استندارد است و اصلا فرمت آدرس آن هم با پس از آن متفاوت است.
+برای دانلود کردن از سایت fide از پکیج 
+`downloader`
+استفاده کردیم و همچنین برای از فشرده&zwnj;سازی خارج کردن آن ها هم از دستور unzip استفاده&zwnj;کردیم.
+
+همچنین برای بازی&zwnj;های rapid و blitz هم به&zwnj;طور جداگانه crawlerی نوشتیم که از آن&zwnj;جایی که تنها با داده&zwnj;های بعد ۲۰۱۲ سر و کار دارند ساده&zwnj;تر اند.
+</div>
+
+<div class = "persian_subheader">
+مرحله&zwnj;ی اول پاک&zwnj;سازی داده&zwnj;ها
+</div>
+
+<div class = "persian_normal">
+اگر که داده&zwnj;های دانلودشده را باز کنید مشاهده می&zwnj;کنید که این داده&zwnj;ها به شدت کثیف هستند و نیاز به پاک&zwnj;سازی دارند.
+برای تبدیل این داده&zwnj;ها که به فرمت تکست هستند به فرمت csv از یک ایده استفاده می&zwnj;کنیم.
+آن هم این است که در خط اول که مربوط به نام ستون&zwnj;هاست به دنبال جاهایی می&zwnj;گردیم که اسپیس پشت یک کلمه است.
+که البته این امر هم مشکلاتی را به همراه دارد زیرا در این داده اسم برخی از ستون&zwnj;ها مثل
+`ID NUMBER`
+هم به صورت
+`ID_NUMBER`
+آمده و هم به صورت
+`ID NUMBER`
+که مورد دوم برای ایده&zwnj;ی گفته&zwnj;شده مشکل&zwnj;زا است.
+پس در این مرحله ابتدا نام برخی از ستون&zwnj;های برخی ماه&zwnj;ها را اصلاح می&zwnj;کنیم
+سپس به دنبال جاهایی که در آن&zwnj;ها اسپیس است و بعدش یک کلمه است می&zwnj;گردیم
+و سپس هم این جایگاه&zwnj;ها را با 
+“\t”
+جایگزین می&zwnj;کنیم تا بتوانیم یک فایل
+
+`tab_separated`
+داشته باشیم.
+(به این دلیل از خود کاما استفاده نمی&zwnj;کنیم که قسمت نام خود شامل کاما است.)
+</div>
+
+<div class = "persian_normal">
+فایل های مربوط به این قسمت با فرمت
+`fide_parser`
+هستند.
+</div>
+
+<div class = "persian_subheader">
+مرحله&zwnj;ی دوم پاک&zwnj;سازی داده&zwnj;ها
+</div>
+
+<div class = "persian_normal">
+حال اگر که یکی از فایل&zwnj;های csv ایجاد شده را باز کنیم و بخوانیم مشاهده&zwnj; می&zwnj;کنیم که همه چیز باز هم به شدت کثیف است.
+تمامی ستون&zwnj;ها و نام ستون&zwnj;ها تعداد ثابتی کاراکتر دارند و حاوی تعداد زیادی
+`white-space`
+هستند.
+همچنین نام ستون&zwnj;های داده&zwnj;های قدیمی&zwnj;تر با نام ستون&zwnj;های داده&zwnj;های جدیدتر متفاوت است.
+در این مرحله این مشکلات را رفع می&zwnj;کنیم و نتایج را ذخیره&zwnj;سازی می&zwnj;کنیم. 
+</div>
+
+<div class = "persian_normal">
+فایل مربوط به این قسمت
+`good_csv`
+است.
+</div>
+
+<div class = "persian_subheader">
+ملحق کردن داده&zwnj;ها به یکدیگر
+</div>
+
+<div class = "persian_normal">
+برای اینکه بتوانیم با این داده&zwnj;ها کار کنیم نیاز است که آن&zwnj;ها را کنار هم قرار دهیم.
+ولی نکته&zwnj;ای که هست این است که به ما در هر فایل به ازای هر ماه ریتینگ و مشخصات فرد را داریم.
+برای اینکه به هدفمان دست پیدا کنیم، داده&zwnj;هایمان را tidy می&zwnj;کنیم، به این صورت که اطلاعات مهم شخص را به همراه ریتینگش و زمان ثبت آن داده در یک سطر قرار می&zwnj;دهیم و سپس همه&zwnj;ی این سطرها را با یکدیگر
+`rbind`
+می&zwnj;کنیم.
+نتایج را هم به صورت جداگانه در ۲ فایل
+`meta`
+که مربوط به اطلاعات بازیکنان در گذر زمان است
+و 
+`rating`
+که مربوط به ریتینگشان در گذر زمان است
+قرار می&zwnj;دهیم.
+</div>
+
+<div class = "persian_normal">
+فایل مربوط به این قسمت
+`fide_standard_joiner`
+است.
+</div>
+
+<div class = "persian_header">
+بررسی&zwnj;کردن داده&zwnj;ی ساخته&zwnj;شده
+</div>
+
+<div class = "persian_subheader">
+تابع
+`draw_time_series`
+</div>
+
+<div class = "persian_normal">
+یکی از اولین نکاتی که هر شطرنج&zwnj;باز (یا شطرنج&zwnj;دوست) دوست&zwnj;دارد بداند و برایش جالب است مقایسه&zwnj;ی خودش یا سایر بازیکنان با هم در طی زمان است.
+ما برای این کار یک تابع می&zwnj;نویسیم که با گرفتن آی&zwnj;دی بازیکنان و همچنین زمان شروع و پایان مورد نظر می&zwnj;تواند نمودار مقایسه&zwnj;ی این بازیکنان را به ما بدهد.
+در ادامه این بررسی را برای دو شطرنج&zwnj;باز بزرگ حال حاضر جهان یعنی آناند و کارلسن، و همچنین برای ۱۵ نفر برتر فعلی ایران انجام می&zwnj;دهیم.
+</div>
+
+<div class = "persian_subheader">
+مقایسه&zwnj;ی کشورهای جهان روی نقشه
+</div>
+
+<div class = "persian_normal">
+اگر بخواهیم برای نقشه&zwnj;کشیدن از پکیج های&zwnj;چارتر استفاده کنیم باید بتوانیم کد کشورها را به فرمت مورد نیاز آن دربیاوریم.
+برای این&zwnj;کار باید از پکیج
+`countrycode`
+استفاده&zwnj;کنیم که از آنجایی که کد های استفاده&zwnj;شده توسط FIDE در هیچ کدام از استانداردهای کدگذاری نام کشورها موجود نیست باید آن&zwnj;ها را ابتدا به نام کامل کشورها تبدیل کنیم.
+که این کار با استفاده از داده&zwnj;ی موجود در  سایت
+http://www.chessgames.com/alpha3.html
+و همچنین با استفاده از کد موجود در country_codes انجام می&zwnj;شود.
+پس روند کار به این صورت است:
+فرمت FIDE به فرمت کامل و از فرمت کامل به 
+`iso2c`
+در نهایت هم برای مشاهده&zwnj;ی نتیجه نقشه&zwnj;ی تعداد بازیکنان فیده را برای تمامی کشورها می&zwnj;کشیم.
+</div>
+
+<div class = "persian_subheader">
+مقایسه&zwnj;ی آناند و کارلسن در طی زمان
+</div>
+
+```{r theme, echo=FALSE, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(ggplot2)
+library(ggthemes)
+
+theme_Publication <-
+  function(base_size = 14,
+           base_family = "Helvetica") {
+    library(grid)
+    library(ggthemes)
+    (
+      theme_foundation(base_size = base_size, base_family = base_family)
+      + theme(
+        plot.title = element_text(
+          face = "bold",
+          size = rel(1.2),
+          hjust = 0.5
+        ),
+        text = element_text(),
+        panel.background = element_rect(colour = NA),
+        plot.background = element_rect(colour = NA),
+        panel.border = element_rect(colour = NA),
+        axis.title = element_text(face = "bold", size = rel(1)),
+        axis.title.y = element_text(angle = 90, vjust = 2),
+        axis.title.x = element_text(vjust = -0.2),
+        axis.text = element_text(),
+        axis.line = element_line(colour = "black"),
+        axis.ticks = element_line(),
+        panel.grid.major = element_line(colour = "#f0f0f0"),
+        panel.grid.minor = element_blank(),
+        legend.key = element_rect(colour = NA),
+        legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.key.size = unit(0.2, "cm"),
+        legend.margin = unit(0, "cm"),
+        legend.title = element_text(face = "italic"),
+        plot.margin = unit(c(10, 5, 5, 5), "mm"),
+        strip.background = element_rect(colour = "#f0f0f0", fill =
+                                          "#f0f0f0"),
+        strip.text = element_text(face = "bold")
+      )
+    )
+    
+  }
+
+scale_fill_Publication <- function(...) {
+  library(scales)
+  discrete_scale("fill", "Publication", manual_pal(
+    values = c(
+      "#386cb0",
+      "#fdb462",
+      "#7fc97f",
+      "#ef3b2c",
+      "#662506",
+      "#a6cee3",
+      "#fb9a99",
+      "#984ea3",
+      "#ffff33",
+      "#e73157",
+      "#049bd9",
+      "#c70394",
+      "#30da63",
+      "#a71916",
+      "#7c092c",
+      "#d07ef6",
+      "#6f27a5",
+      "#de0bfb",
+      "#c0e03f",
+      "#bb74fc",
+      "#bbfc74"
+    )
+  ), ...)
+  
+}
+
+scale_colour_Publication <- function(...) {
+  library(scales)
+  discrete_scale("colour", "Publication", manual_pal(
+    values = c(
+      "#386cb0",
+      "#fdb462",
+      "#7fc97f",
+      "#ef3b2c",
+      "#662506",
+      "#a6cee3",
+      "#fb9a99",
+      "#984ea3",
+      "#ffff33",
+      "#e73157",
+      "#049bd9",
+      "#c70394",
+      "#30da63",
+      "#a71916",
+      "#7c092c",
+      "#d07ef6",
+      "#6f27a5",
+      "#de0bfb",
+      "#c0e03f",
+      "#bb74fc",
+      "#bbfc74"
+    )
+  ), ...)
+}
+theme_set(theme_Publication())
+scale_colour_discrete <- scale_colour_Publication
+scale_fill_discrete <- scale_fill_Publication
+```
+
+```{r sample0, echo=TRUE, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(highcharter)
+library(readr)
+library(tidyr)
+library(dplyr)
+meta_data_df <- read_delim(file = "../integrated/meta",delim = "\t")
+df_rating <- read_delim(file = "../integrated/rating",delim = "\t")
+country_codes_df <- read_csv("../country_codes/country_codes.csv")
+
+
+draw_time_series <- function(IDs, shared,start = as.Date("1900-05-01"), end = as.Date("2030-05-01")){
+  df_rating %>%select(-K) %>% filter(ID %in% IDs, R_TIME <= end, R_TIME >= start) -> rating_over_time
+  meta_data_df %>% filter(ID %in% IDs) %>% select(ID, NAME) %>% unique -> id_names
+  left_join(rating_over_time, id_names) -> result
+  
+  return(result %>% arrange(R_TIME) %>% 
+    hchart("line", hcaes(x = R_TIME, y = RATING, group = NAME)) %>% 
+    hc_xAxis(title = list(text = "Time")) %>%
+    hc_yAxis(title = list(text = "FIDE Rating"))  %>%
+    hc_tooltip(crosshairs = T, shared = shared, sort = T) %>%
+    hc_add_theme(hc_theme_sandsignika()))
+}
+draw_time_series(c(5000017, 1503014), T)
+```
+
+<div class = "persian_subheader">
+شطرنج&zwnj;بازترین ملل
+</div>
+
+```{r sample1, echo=TRUE, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, paged.print=FALSE}
+meta_data_df %>% filter(R_TIME == as.Date("2018-05-01")) -> current_players
+
+library(countrycode)
+current_players %>%
+  group_by(FED) %>%
+  summarize(value = n()) %>%
+  filter(nchar(FED) == 3) %>% 
+  rename(Abrv = FED) %>% 
+  full_join(country_codes_df) %>% 
+  mutate(Abrv = countrycode(Full, "country.name", "iso2c" )) %>% 
+  na.omit() %>% 
+  rename(`hc-key` = Abrv)-> by_country 
+
+hcmap("custom/world-robinson", 
+      data = by_country, 
+      value = "value",
+      joinBy = c("hc-a2", "hc-key"),
+      name = "No. of FIDE chess players",
+      tooltip = list(valueDecimals = 0, valuePrefix = "", valueSuffix = " players")) 
+
+```
+
+<div class = "persian_subheader">
+سیر حرکت برترین ایرانی&zwnj;ها
+</div>
+
+```{r sample2, echo=TRUE, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, paged.print=FALSE}
+iranians <- current_players %>% filter(FED == "IRI") %>% select(ID) %>% unique()
+top_iranians <- df_rating %>% filter(R_TIME == as.Date("2018-05-01"),
+                                     ID %in% iranians$ID) %>% top_n(n = 15, wt = RATING) %>% .$ID %>% unique()
+
+draw_time_series(top_iranians, T, start = as.Date("2010-01-01"))
+```
+
+
+> <p dir="RTL"> 
+کار های مربوط به این قسمت مربوط به پاک&zwnj;سازی داده&zwnj;های با فرمت PGN
+است.
+</p>
+
+
+<div class = "persian_header">
+پاک&zwnj;سازی داده&zwnj;های فرمت PGN و تبدیل آن&zwnj;ها به CSV
+</div>
+
+<div class = "persian_normal">
+فرمت PGN
+به این صورت است که شامل تعدادی تگ پیش از حرکات هر بازی&zwnj;است که این تگ&zwnj;ها در واقع توضیحاتی درباره&zwnj;ی آن بازی هستند من&zwnj;جمله&zwnj;ی نام بازیکن&zwnj;ها، مسابقه، دور، نتیجه، تیم بازیکن&zwnj;ها و ... .
+ولی نکته&zwnj;ای که هست این است که تمام بازی&zwnj;ها تمام این تگ&zwnj;ها را ندارند و ترتیب تگ&zwnj;ها ممکن است بسیار متفاوت باشد.
+برای نمونه می&zwnj;توانید داده&zwnj;ی زیر را بببینید که مربوط به خطوط یک بازی&zwnj;است.
+</div>
+```
+   [2] "[Event \"Karposh Open 2012\"]"                                             
+   [3] "[Site \"Skopje MKD\"]"                                                     
+   [4] "[Date \"2012.04.10\"]"                                                     
+   [5] "[Round \"5.37\"]"                                                          
+   [6] "[White \"Koksal, E. (wh)\"]"                                               
+   [7] "[Black \"Simjanovski, S. (bl)\"]"                                          
+   [8] "[Result \"1-0\"]"                                                          
+   [9] "[WhiteElo \"2154\"]"                                                       
+  [10] "[BlackElo \"2288\"]"                                                       
+  [11] "[ECO \"A40\"]"                                                             
+  [12] "1. d4 g6 2. c4 Bg7 3. e4 Nc6 4. Nf3 e5 5. dxe5 Nxe5 6. Nxe5 Bxe5 7. f4 Bg7"
+  [13] "8. Be2 Qe7 9. Qd3 Qb4+ 10. Nc3 Bxc3+ 11. bxc3 Qe7 12. O-O d6 13. Bf3 f6 "  
+  [14] "14. Ba3 Nh6 15. e5 Bf5 16. Qd5 c6 17. Qa5 Nf7 18. Rfe1 fxe5 19. fxe5 O-O " 
+  [15] "20. exd6 Qh4 21. d7 Bxd7 22. Bxf8 Rxf8 23. Qc7 Bc8 24. Re4 Qf6 25. Rae1 "  
+  [16] "Qxc3 26. Qf4 Bf5 27. R4e3 Qb4 28. Qd4 a5 29. a3 Qd6 30. Qxd6 Nxd6 31. c5 " 
+  [17] "Nb5 32. Be2 Kg7 33. Bc4 h5 34. Re7+ Kf6 35. Bxb5 cxb5 36. Rxb7 Bd3 37. c6 "
+  [18] "Rc8 38. c7 b4 39. axb4 axb4 40. Rc1 1-0"  
+```
+<div class = "persian_subheader">
+تابع 
+`pgn_cleaner`
+</div>
+
+<div class = "persian_normal">
+وظیفه&zwnj;ی این تابع این است که بیاید و داده&zwnj;های با فرمت PGN را به داده&zwnj;های تمیز به صورت دیتافریم درآورد.
+در این تابع ما می&zwnj;آییم و ابتدا اندیس&zwnj;های شروع هر بازی را پیدا می&zwnj;کنیم.
+سپس برای هر بازی قسمت مربوط به آن&zwnj;را جدا می&zwnj;کنیم و در آن قسمت ابتدا مقادیر تگ&zwnj;ها و سپس حرکات را جدا می&zwnj;کنیم و در دیتافریممان می&zwnj;ریزیم.
+</div>
+
+<div class = "persian_subheader">
+نحوه&zwnj;ی خواندن از فایل
+</div>
+
+<div class = "persian_normal">
+از آنجایی که فایل ما بسیار بزرگ است و دارای ۴ گیگابایت حجم و بیش از ۱۳۰ میلیون خط است، نمی توان تمام آن را پاک سازی کرد.
+بنابراین ما تصمیم می&zwnj;گیریم که تنها یک درصد آن را استفاده کنیم.
+برای این کار آن را به چانک&zwnj;های یک میلیون&zwnj;تایی تقسیم می&zwnj;کنیم و ۱۰ هزار خط اول آن را می&zwnj;خوانیم. 
+در نهایت هر چانک را پس از تمیز شدن در فایل&zwnj;هایی ریختیم و سپس هم آن&zwnj;ها را با هم بایند کردیم تا یک فایل واحد به&zwnj;دست&zwnj;آید.
+</div>
+
+<div class = "persian_subheader">
+تابع 
+`wrtie_files`
+</div>
+
+<div class = "persian_normal">
+این تابع هر چانک را می&zwnj;خواند و تبدیل می&zwnj;کند و در فایل مربوط به آن می&zwnj;نویسد.
+</div>
+
+
+
+<div class = "persian_header">
+برخی یافته&zwnj;های جالب
+</div>
+
+<div class = "persian_subheader">
+شطرنج&zwnj;بازان در چه سنی به اوج دوران کاری خود می&zwnj;رسند؟
+</div>
+
+<div class = "persian_normal">
+از آنجایی که پردازش این داده&zwnj;ها زمان&zwnj;بر است در هنگام اجرا یک&zwnj;بار آن&zwnj;ها را دخیره&zwnj;کرده&zwnj;ایم و اینجا تنها از نتیجه&zwnj;ی نهایی استفاده می&zwnj;کنیم.
+</div>
+
+```{r ages, echo=TRUE, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+###########ATTENTION: uncomment to use original file
+# meta_data_df <- read_delim(file = "integrated/meta",delim = "\t")
+# df_rating <- read_delim(file = "integrated/rating",delim = "\t")
+# 
+# library(dplyr)
+# 
+# df_rating %>%
+#   select(ID, R_TIME, RATING) %>%
+#   inner_join(meta_data_df %>% select(ID, R_TIME),
+#              by = c("ID", "R_TIME")) -> ID_RATING_TIME
+# 
+# ID_RATING_TIME %>%
+#   group_by(ID) %>%
+#   top_n(n = 1, wt = RATING) %>%
+#   ungroup() %>% 
+#   select(-RATING) %>%
+#   inner_join(meta_data_df %>% 
+#                select(ID, BDAY) %>%
+#                filter(BDAY !="0000", !is.na(BDAY)) %>% 
+#                unique()) -> BDAY_BEST_R_TIME
+# 
+# write_csv(x = BDAY_BEST_R_TIME,path = "integrated/BDAY_BEST_R_TIME.csv")
+# 
+# BDAY_BEST_R_TIME <- read_csv("integrated/BDAY_BEST_R_TIME.csv")
+# 
+# BDAY_BEST_R_TIME %>%
+#   mutate(age = as.numeric(format.Date(R_TIME, "%Y")) - as.numeric(BDAY)) %>% 
+#   .$age -> ages
+# ages[(ages < 100) &(!is.na(ages))& ages > 0] -> best_ages
+# 
+# table(best_ages) %>% 
+#   as.data.frame() %>% 
+#   mutate(best_ages = as.numeric(best_ages)) -> best_ages_table
+# 
+# write_csv(best_ages_table, path = "integrated/BEST_AGES_TABLE.csv")
+
+best_ages_table <- read_csv("../integrated/BEST_AGES_TABLE.csv")
+
+
+best_ages_table %>% 
+  mutate(percent = round(Freq/sum(Freq),3)* 100) %>% 
+hchart(type = "area", hcaes(x = best_ages, y = Freq),
+       marker = list(radius = 0),
+       tooltip = list(pointFormat =
+                        "Count: {point.Freq}<br/> 
+                         Percent: {point.percent}%<br/>")
+       ) %>% 
+  hc_tooltip(valueDecimals = 0) %>% 
+  hc_xAxis(title = list(text = "Age"), crosshair = T) %>% 
+  hc_yAxis(title = list(text = "Count")) %>% 
+  hc_title(text = "Best Age in Chess Players' Career") %>% 
+  hc_tooltip(shared = T)  %>%
+  hc_add_theme(hc_theme_sandsignika())
+```
+
+<div class = "persian_normal">
+در این نمودار مشاهده می &zwnj;کنیم که اکثر شطرنج&zwnj;بازها در سن ۱۷ سالگی به بیشینه&zwnj;ی دوران فعالیت خود رسیده&zwnj;اند و درصد افرادی که در بعد از ۱۷ سالگی به اوج موفقیت خود رسیده&zwnj;اند از ۳۰ سالگی تا ۵۰ سالگی ثابت است و پس از آن هم با شیب زیادی کم می&zwnj;شود.
+</div>
+
+<div class = "persian_normal">
+این پدیده را می&zwnj;توان از جهات زیادی مورد بررسی قرار داد من&zwnj;جمله اینکه در ۱۷ سالگی چه اتفاقی می&zwnj;افتد که اکثر شطرنج&zwnj;بازان دیگر پیشرفتی نمی&zwnj;کنند و نقطه&zwnj;ی اوج دوران فعالیتشان می&zwnj;شود ۱۷ سالگی.
+یکی از دلایل این امر می&zwnj;تواند این باشد که به&zwnj;دلایل مختلف از جمله دانشگاه شطرنج را رها می&zwnj;کنند.
+</div>
+
+
+<div class = "persian_subheader">
+تاثیر رنگ در ریتینگ&zwnj;های پایین&zwnj;تر بیشتر است یا ریتینگ&zwnj;های بالاتر
+</div>
+
+<div class = "persian_normal">
+تاثیر رنگ در نتیجه بسیار جالب است. به این صورت که اگر سفید باشید در ریتینگ های بالاتر هم احتمال برد شما کمتر می شود و هم احتمال باختتان ولی نکته&zwnj;ای که هست این است که احتمال برد حریف شما با شیب بیشتری کاهش می&zwnj;یابد پس به طور کلی با افزایش ریتینگ شما شاهد احتمال بیشتر برد سفید در مقابل برد سیاه خواهید بودو
+</div>
+
+```{r bw, echo=TRUE, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(highcharter)
+
+read_csv("../chunk_integrated/file.csv") -> bigfile
+bigfile %>% mutate(WElo = as.numeric(WElo),
+                        BElo = as.numeric(BElo)) %>%
+  select(WElo, BElo, Result) %>%
+  mutate(
+    Ww = (Result == "1-0"),
+    Wd = (Result == "1/2-1/2"),
+    Wl = (Result == "0-1")
+  ) %>%
+  mutate(matchElo = (WElo + BElo) / 2) %>%
+  mutate(matchElo = round(matchElo, -2)) %>%
+  group_by(matchElo) %>% 
+  summarize(White_Winnigs = sum(Ww),
+            White_Draws = sum(Wd),
+            White_Loses = sum(Wl)) %>% 
+  drop_na() -> color_sig
+  
+color_sig %>% filter(White_Winnigs+White_Draws+White_Loses > 10)%>%
+  gather(Partition, Count, White_Winnigs:White_Loses) %>% 
+  mutate(Partition = factor(Partition, levels = c("White_Winnings", "White_Draws", "White_Loses"))) %>% 
+  hchart(type = "area", hcaes(x = matchElo, y = Count, group = Partition),
+         marker = list(radius = 0)) %>% 
+  hc_plotOptions(area = list(stacking = "percent")) %>% 
+  hc_tooltip(valueDecimals = 0) %>% 
+  hc_xAxis(title = list(text = "Match Rating"), crosshair = T) %>% 
+  hc_yAxis(title = list(text = "Percent (%)"), max = 100) %>% 
+  hc_title(text = "Match Rating effect on White's Result") %>%
+  hc_tooltip(shared = T)  %>%
+  hc_add_theme(hc_theme_sandsignika())
+
+  color_sig %>% select(-matchElo)%>% chisq.test()
+  
+```
+
+<div class = "persian_subheader">
+سیر تغییر ۱۰ شروع بازی برتر در چند سال اخیر(۱۰ حرکت ابتدای بازی)
+</div>
+
+<div class = "persian_normal">
+یک نکته&zwnj;ی جالب که در مورد این نمودار وجود دارد این است که در دنیای شطرنج یک شروع بازی متداول می&zwnj;شود و همه در یک سال به سراغ آن  می&zwnj;روند ولی سال بعد از آن دیگر کسی آن را بازی نمی&zwnj;کند. کمی شبیه چیزی که در دنیای مد مشاهده می&zwnj;کنیم.
+برای شفاف&zwnj;تر شدن موضوع می&zwnj;توانید نمودار زیر را مشاهده نمایید.
+در این نمودار می&zwnj;بینیم که یکی از شروع بازی&zwnj;های محبوب در یک سال بسیار محبوب می&zwnj;شود و سپس محبوبیت خود را در سال بعد از دست می&zwnj;دهد.
+</div>
+
+```{r starting, echo=TRUE, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(stringr)
+bigfile %>% 
+mutate(Moves =  str_trim(Moves)) %>%
+  separate(col = Moves, into = paste0("M",as.character(0:20)),
+           sep = "\\s*[:digit:]*\\.\\s*|\\s+") %>% 
+  select(-M0) %>%
+  drop_na() %>% 
+  mutate(Open = paste(M1,M2,M3,M4,M5,M6,M7,M8,M9,M10)) %>% 
+  group_by(Open) %>% 
+  summarize(count = n()) %>%
+  ungroup() %>% 
+  top_n(wt = count, n = 10) %>% 
+  arrange(desc(count))  -> pop_openings
+
+bigfile %>% 
+  mutate(Moves =  str_trim(Moves)) %>%
+  separate(col = Moves, into = paste0("M",as.character(0:20)),
+           sep = "\\s*[:digit:]*\\.\\s*|\\s+") %>% 
+  select(-M0) %>%
+  mutate(Open = paste(M1,M2,M3,M4,M5,M6,M7,M8,M9,M10)) %>% 
+  select(Open, Date) %>% 
+  drop_na() %>% 
+  mutate(Date = as.numeric(substr(start = 1, stop = 4,x = Date))) %>%
+  filter(Open %in% pop_openings$Open) %>% 
+  group_by(Date, Open) %>% 
+  summarize(count = n()) %>% 
+  ungroup() %>% 
+  group_by(Open) %>% 
+  arrange(Date) -> pop_openings_dist
+pop_openings_dist %>% 
+  hchart(type = "line", hcaes(x = Date, y = count, group = Open),
+       marker = list(radius = 0)) %>% 
+  hc_tooltip(valueDecimals = 0) %>% 
+  hc_xAxis(title = list(text = "Year"), crosshair = T,min = 1990) %>% 
+  hc_yAxis(title = list(text = "Count")) %>% 
+  hc_tooltip(shared = T)  %>%
+  hc_add_theme(hc_theme_sandsignika())
+  
+pop_openings_dist %>%
+  filter(Date > 1990) %>%
+  spread(key = Open, value = count) %>%
+  select(-Date) %>%
+  drop_na() %>%
+  chisq.test()
+```
+
+
+<div class = "persian_subheader">
+در چند درصد موارد بازیکن با ریتینگ بالاتر برنده است و تاثیر اختلاف ریتینگ طرفین در توزیع نتیجه&zwnj;ی بازی
+</div>
+
+<div class = "persian_normal">
+این نمودارها نکته&zwnj;ی خاصی ندارند و صرفن به ما شهودی می&zwnj;دهند از سطح معناداری اختلاف ریتینگ&zwnj;ها در شطرنج.
+تا بفهمیم هنگامی که گفته می&zwnj;شود فلان بازیکن از فلان بازیکن ۲۰۰ تا ریتینگش بیشتر است، تقریبی از احتمال نتیجه&zwnj;ی بازی میان این ۲ داشته&zwnj;یاشیم.
+</div>
+
+```{r stronger_weaker, echo=TRUE, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, paged.print=FALSE}
+bigfile %>% mutate(WElo = as.numeric(WElo),
+                   BElo = as.numeric(BElo)) %>%
+  select(WElo, BElo, Result) %>% 
+  mutate(
+    Ww = (Result == "1-0"),
+    Wd = (Result == "1/2-1/2"),
+    Wl = (Result == "0-1")
+  ) %>%
+  mutate(
+    WRating = if_else(Ww, true = WElo, false = BElo),
+    LRating = if_else(Ww, true = BElo, false = WElo)
+  ) %>%
+  select(Draw = Wd, WRating, LRating) %>% drop_na() %>% 
+  mutate(StrongerStatus = if_else(Draw, "Draw", if_else(WRating > LRating, "Win", "Lose"))) %>% 
+  select(StrongerStatus) %>% 
+  group_by(StrongerStatus) %>% 
+  summarize(count = n()) %>% 
+  mutate(percent = round(count / sum(.$count), 3) * 100) %>% 
+  hchart(type = "pie",
+         hcaes(
+           x = StrongerStatus,
+           y = count,
+           name = as.factor(StrongerStatus)
+         ),
+         tooltip = list(pointFormat ="count: {point.count} <br/> 
+                           percent: {point.percent} % <br/>")
+         ) %>%
+  hc_title(text = "Stronger Person Results Ratio") %>%
+  hc_add_theme(hc_theme_sandsignika())
+
+##### Rating Difference Distribution
+####################################
+bigfile %>% mutate(WElo = as.numeric(WElo),
+                   BElo = as.numeric(BElo)) %>%
+  select(WElo, BElo, Result) %>% 
+  mutate(
+    Ww = (Result == "1-0"),
+    Wd = (Result == "1/2-1/2"),
+    Wl = (Result == "0-1")
+  ) %>% 
+  mutate(Wdif = WElo - BElo) %>% 
+  mutate(WResult = if_else(Ww, "W", if_else(Wd, "D", "L"))) %>% 
+  mutate(WResult = factor(WResult, levels = c("W", "D", "L"))) %>% 
+  select(WResult, Wdif) %>% 
+  mutate(Wdif = round(Wdif, -1)) %>% 
+  group_by(WResult, Wdif) %>% 
+  summarize(count = n()) %>% 
+  ungroup() %>% 
+  group_by(Wdif) %>% 
+  mutate(percent = round(count / sum(count),3) * 100) %>% 
+  ungroup() %>% 
+  drop_na() %>% 
+  hchart(type = "area", hcaes(x = Wdif, y = count, group = WResult),
+         marker = list(radius = 0),
+         tooltip = list(pointFormat ="<b>{point.WResult}</b> <br/> count: {point.count} <br/> 
+                           percent: {point.percent} % <br/>")) %>% 
+  hc_plotOptions(area = list(stacking = "percent")) %>% 
+  hc_tooltip(valueDecimals = 0) %>% 
+  hc_xAxis(title = list(text = "Match Rating"), crosshair = T, min = -600, max = 600) %>% 
+  hc_yAxis(title = list(text = "Percent (%)"), max = 100) %>% 
+  hc_tooltip(shared = T)  %>%
+  hc_title(text = "Results Distribution by Rating Difference") %>%
+  hc_add_theme(hc_theme_sandsignika())
+
+```
+
+
+<div class = "persian_subheader">
+تاثیر اختلاف ریتینگ در ریتینگ&zwnj;های بالاتر بیشتر است یا ریتینگ&zwnj;های پایین&zwnj;تر
+</div>
+
+<div class = "persian_normal">
+ریتینگ&zwnj;ها را در دسته&zwnj;های ۱۰۰ تایی قرار می&zwnj;دهیم و بازی&zwnj;هایی که میان افرادی از دسته&zwnj;ی یک ریتینگی و ۲۰۰ تا بیشتر از آن یا کمتر است را بررسی می&zwnj;کنیم و می&zwnj;بینیم در چند درصد موارد نتیجه چه طور بوده&zwnj;است و آیا اختلاف ریتینگ در سطوح مختلف تفاوتی دارد یا نه.
+</div>
+
+<div class = "persian_normal">
+مشاهده می&zwnj;کنیم که سطج بازی&zwnj;کنان در معناداری اختلاف ریتینگ چندان تاثیرگذار نیست ولی تاثیرگذار هست(توزیع خیلی هم یونیفورم نیست.
+)
+</div>
+
+```{r difference_sig, echo=TRUE, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+bigfile %>% mutate(WElo = as.numeric(WElo),
+                        BElo = as.numeric(BElo)) %>%
+  select(WElo, BElo, Result) %>% 
+  mutate(
+    Ww = (Result == "1-0"),
+    Wd = (Result == "1/2-1/2"),
+    Wl = (Result == "0-1")
+  ) %>%
+  mutate(
+    WRating = if_else(Ww, true = WElo, false = BElo),
+    LRating = if_else(Ww, true = BElo, false = WElo)
+  ) %>%
+  select(Draw = Wd, WRating, LRating) %>% drop_na() %>% 
+  ggpubr::ggscatter(x = "WRating", y = "LRating", 
+                    add = "reg.line", conf.int = TRUE, 
+                    cor.coef = TRUE, cor.method = "spearman",
+                    xlab = "Winner Rating", ylab = "Loser Rating",
+                    color = "Draw", alpha = 0.5)+
+  guides(color = F) +
+  geom_abline(slope = 1, intercept = 0)
+  
+bigfile %>%
+  mutate(WElo = as.numeric(WElo), BElo = as.numeric(BElo)) %>%
+  select(WElo, BElo, Result) %>% 
+  mutate(
+    Ww = (Result == "1-0"),
+    Wd = (Result == "1/2-1/2"),
+    Wl = (Result == "0-1")
+  ) %>%
+  mutate(
+    Bigger = if_else(WElo >= BElo, true = WElo, false = BElo),
+    Smaller = if_else(WElo >= BElo, true = BElo, false = WElo)
+  ) %>% 
+  mutate(
+    Bigger_w = ((WElo >= BElo) & Ww) | ((WElo <= BElo) & Wl),
+    Bigger_d = Wd
+  ) %>% 
+  mutate(
+    Bigger_l = !(Bigger_w | Bigger_d)
+  ) %>% 
+  mutate(difference = Bigger - Smaller) %>% 
+  mutate(Bigger = round(Bigger, -2),
+         difference = round(difference, -2)) %>%
+  group_by(Bigger, difference) %>% 
+  summarize(Bigger_w = sum(Bigger_w), Bigger_l = sum(Bigger_l), Bigger_d = sum(Bigger_d)) %>% 
+  filter(difference == 200) %>% 
+  filter((Bigger_w +  Bigger_l + Bigger_d) > 10)-> distribution_for_test
+
+
+chisq.test(distribution_for_test %>% select(-Bigger, -difference))
+
+distribution_for_test %>%
+  mutate(Bigger_win_rate = (Bigger_w)/(Bigger_w+Bigger_l+Bigger_d)) %>% 
+  select(Bigger, Bigger_win_rate) %>% 
+  arrange(desc(Bigger)) %>% 
+  ggplot(aes(x = Bigger, y = Bigger_win_rate))+
+  geom_area()+
+  ggtitle("Versus 200 Less in Rating Opponents")+
+  xlab("Stronger Rating")+
+  ylab("Win Rate")+
+  ylim(c(0,1))
+
+```
+
+<div class = "persian_header">
+مخزن گیت&zwnj;هاب پروژه
+</div>
+https://github.com/Mahbodmajid/DA_project_chess
